@@ -1,0 +1,41 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "My API",
+        "description": "My API description",
+        "version": "1.0.0"
+    },
+    "paths": {
+        "/api/client/getClientByBarCode/{barCode}": {
+            "get": {
+                "tags": [
+                    "Clients"
+                ],
+                "summary": "Returns a client by his barcode",
+                "operationId": "7a105405769ccfb66b395aa89f5c026a",
+                "parameters": [
+                    {
+                        "name": "barCode",
+                        "in": "path",
+                        "description": "barCode",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful operation !"
+                    },
+                    "404": {
+                        "description": "Client not found "
+                    },
+                    "500": {
+                        "description": "Server error "
+                    }
+                }
+            }
+        }
+    }
+}
