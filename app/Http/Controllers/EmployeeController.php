@@ -8,22 +8,21 @@ use App\Models\User;
 use Illuminate\Http\Request;
 class EmployeeController extends Controller
 {
-    public function addEmployee(Request $request, $station_id, UserController $userController) {
-        if($userController->isStationAdmin($request->user()) || $userController->isSuperAdmin($request->user())) {
-        $station = Station::where('id',$station_id)->get()->first();
-        if(!$station)
-            return response()->json("Station not found !", 404);
-        $user = $userController->addUser($request);
-            if($user == "phone in use") {
+    public function addEmployee(Request $request, UserController $userController) {
+        if($userController->isSuperAdmin($request->user())) {
+        $user = $userController->addUser($request, true);
+             if($user == "email in use") {
+                return response()->json(["Email already in use"],401);
+            } else if($user == "phone in use") {
                 return response()->json(["Phone number already in use"],200);
         } else if ($user == "barcode in use") {
                 return response()->json(["Barcode already assigned"],200);
         } else {
             $employee = Employee::create([
-                'user_id' => $user->id,
-                'station_id' => $station_id
+                'user_id' => $user->id
             ]);
-            return response()->json(["Employee added successfully !"=>$employee], 200);
+            $employee->user = $user;
+            return response()->json(["employee"=>$employee], 200);
         }
         } else {
             return response()->json(["Forbidden"],403);
@@ -49,6 +48,15 @@ class EmployeeController extends Controller
         if($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
             return response()->json(["employees"=>Employee::where("station_id",$station_id)->with("user")->get()],200);
         } else{
+
+            return response()->json(["Forbidden"],403);
+        }
+    }
+
+    public function findAll(Request $request, UserController $userController) {
+        if($userController->isSuperAdmin($request->user())) {
+            return response()->json(["employees"=>Employee::with("user")->with("station")->with('consultations')->get()],200);
+        } else {
 
             return response()->json(["Forbidden"],403);
         }

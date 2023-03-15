@@ -24,4 +24,9 @@ class Client extends User
     {
         return $this->belongsTo(User::class);
     }
+
+    public function station()
+    {
+        return $this->belongsTo(Station::class, 'registeredAt');
+    }
 }

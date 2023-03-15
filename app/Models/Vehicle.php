@@ -14,7 +14,6 @@ class Vehicle extends Model
         'brand',
         'model',
         'year',
-        'type',
         'fuelType',
         'mileage',
         'lastOilChange',
@@ -24,6 +23,11 @@ class Vehicle extends Model
     public function client()
     {
         return $this->belongsTo(Client::class);
+    }
+
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class);
     }
 }
 

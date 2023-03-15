@@ -18,6 +18,7 @@ return new class extends Migration
             $table->double("discount")->nullable();
             $table->integer("duration");
             $table->string("type");
+            $table->integer("status")->default(-1);
             $table->unsignedBigInteger('vehicle_id')->nullable();
             $table->unsignedBigInteger('employee_id')->nullable();
             $table->timestamp('dateConsultation')->nullable();

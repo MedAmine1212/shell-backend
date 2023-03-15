@@ -11,37 +11,26 @@ use Illuminate\Http\Request;
 class ClientController extends Controller
 {
 
-    /**
-     * @OA\Post(
-     *     path="/api/addClient",
-     *     summary="Add a new client",
-     *     tags={"Client"},
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/ClientRequest")
-     *     ),
-     *     @OA\Response(
-     *         response="200",
-     *         description="Client added successfully",
-     *         @OA\JsonContent(ref="#/components/schemas/ClientResponse")
-     *     )
-     * )
-     */
+
     public function addClient(Request $request, UserController $userController) {
 
-        $user = $userController->addUser($request);
-        if($user == "phone in use") {
+        $user = $userController->addUser($request, true);
+        if($user == "email in use") {
+            return response()->json(["Email already in use"],401);
+        } else if($user == "phone in use") {
             return response()->json(["Phone number already in use"],401);
         } else if ($user == "barcode in use") {
            return response()->json(["Barcode already assigned"],401);
         } else {
-
+            $registeredAt = null;
+            if($request->has("registeredAt"))
+                $registeredAt = $request->get("registeredAt");
             $client = Client::create([
                 'user_id' => $user->id,
-                'registeredAt' => $request->get("registeredAt")
+                'registeredAt' => $registeredAt
             ]);
-
-            return response()->json(["Client" => $client], 200);
+            $client->user = $user;
+            return response()->json(["client" => $client], 200);
         }
     }
 
@@ -60,8 +49,10 @@ class ClientController extends Controller
         }
         if($authorized) {
             $u = User::where("barCode", $barCode)->get()->first();
-            if($u)
-                return response()->json(["Barcode already assigned !"], 401);
+            if($u) {
+                if( $u->id != $client->user->id)
+                    return response()->json(["Barcode already assigned !"], 401);
+            }
             $client->user->barCode = $barCode;
             $client->user->update();
             $client->validated = true;
@@ -90,6 +81,15 @@ class ClientController extends Controller
             return response()->json(["unvalidatedClients" => Client::where('validated', false)->where('registeredAt',$station_id)->with('user')->get()]);
         } else {
             return response()->json(["Forbidden"],403);
+        }
+    }
+
+    public function findAllClients(UserController $userController, Request $request) {
+        if($userController->isSuperAdmin($request->user())) {
+            $clients = Client::with("station")->with("user")->get();
+            return response()->json(['clients' => $clients], 200);
+        } else{
+            return response()->json(['error' => 'Unauthorised'], 403);
         }
     }
 }

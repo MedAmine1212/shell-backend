@@ -11,12 +11,5 @@ use Illuminate\Http\Request;
 
 class SuperAdminController extends Controller
 {
-    public function findAllClients(UserController $userController, Request $request) {
-            if($userController->isSuperAdmin($request->user())) {
-            $clients = Client::all()->with("station");
-            return response()->json(['Clients' => $clients], 200);
-        } else{
-            return response()->json(['error' => 'Unauthorised'], 403);
-        }
-    }
+
 }

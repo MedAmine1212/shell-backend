@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('firstName', 25)->default('');
             $table->string('lastName', 25)->default('');
             $table->string("phone",20)->default('')->unique();
+            $table->string("email",255)->nullable(false)->unique();
             $table->string("barCode", 255)->nullable()->unique();
             $table->string("password", 255)->nullable()->default('');
             $table->timestamps();

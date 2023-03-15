@@ -14,11 +14,10 @@ return new class extends Migration
     {
         Schema::create('vehicles', function (Blueprint $table) {
             $table->id()->autoIncrement();
-            $table->string("matricule", 10);
+            $table->string("matricule", 10)->unique();
             $table->string("brand", 50);
             $table->string("model", 50);
             $table->integer("year");
-            $table->string("type",50);
             $table->string("fuelType", 50);
             $table->bigInteger("mileage");
             $table->timestamp('lastOilChange');

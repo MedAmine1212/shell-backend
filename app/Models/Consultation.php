@@ -13,6 +13,7 @@ class Consultation extends Model
         'price',
         'discount',
         'type',
+        'status',
         'duration',
         'vehicle_id',
         'employee_id',

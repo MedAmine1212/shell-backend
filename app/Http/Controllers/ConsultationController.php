@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Consultation;
 use App\Models\Employee;
 use App\Models\Station;
+use App\Models\Vehicle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -12,11 +13,11 @@ use Illuminate\Support\Facades\DB;
 class ConsultationController extends Controller
 {
     public function findAllByVehicleId($vehicle_id) {
-        return response()->json(["consultations" => Consultation::where("vehicle_id", $vehicle_id)->with("employee")->get()],200);
+        return response()->json(["vehicle" => Vehicle::where("id", $vehicle_id)->with("client.user")->with("consultations.employee.user")->with("consultations.consultationService.service")->get()->first()],200);
     }
 
     public function findAllByEmployeeId($employee_id) {
-        return response()->json(["consultations" => Consultation::where("employee_id", $employee_id)->with("vehicle")->get()],200);
+        return response()->json(["employee" => Employee::where("id", $employee_id)->with("user")->with("consultations.vehicle.client.user")->get()->first()],200);
     }
 
     public function addConsultation(Request $request) {
@@ -162,5 +163,16 @@ class ConsultationController extends Controller
             $occupiedTimes[$i++] = $empOccupied;
         }
         return $occupiedTimes;
+    }
+
+    public function deleteConsultation(Request $request, UserController $userController, $consultation_id) {
+        if($userController->isSuperAdmin($request->user())) {
+            $consultation = Consultation::where('id',$consultation_id)->get()->first();
+            if(!$consultation) return response()->json(["Consultation not found"], 404);
+            $consultation->delete();
+            return response()->json(["Consultation deleted successfully"]);
+        }else {
+            return response()->json(["Forbidden"],403);
+        }
     }
 }

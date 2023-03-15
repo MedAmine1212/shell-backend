@@ -17,7 +17,7 @@ return new class extends Migration
             $table->primary(['service_id', 'consultation_id']);
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
             $table->foreign('consultation_id')->references('id')->on('consultations')->onDelete('cascade');
-            $table->string("status",255)->default("");
+            $table->string("status",255)->default("")->nullable();
             $table->timestamps();
         });
     }
