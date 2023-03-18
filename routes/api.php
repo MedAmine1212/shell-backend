@@ -14,6 +14,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\StationAdminController;
 use App\Http\Controllers\VehicleController;
+use App\Http\Controllers\WorkingDaysController;
 use App\Http\Controllers\WorkScheduleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -197,6 +198,7 @@ Route::middleware('auth:api')->group(function () {
         Route::post('create', [WorkScheduleController::class, 'createWorkSchedule']); //done
         Route::get('assignToStation/{station_id}/{word_schedule_id}', [WorkScheduleController::class, 'assignToStation']); //done
         Route::put('update/{work_schedule_id}', [WorkScheduleController::class, 'updateWorkSchedule']); //done
+        Route::put('updateWorkingDay/{working_day_id}', [WorkingDaysController::class, 'updateWorkingDay']); //done
         Route::delete('delete/{work_schedule_id}', [WorkScheduleController::class, 'deleteWorkSchedule']); //done
     });
 

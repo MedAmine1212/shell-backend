@@ -15,10 +15,10 @@ return new class extends Migration
             $table->id();
             $table->string("day", 10);
             $table->boolean("working")->default(true);
-            $table->string("shiftStart", 10);
-            $table->string("shiftEnd", 10);
-            $table->string("pauseStart", 10);
-            $table->string("pauseEnd", 10);
+            $table->string("shiftStart", 10)->nullable();
+            $table->string("shiftEnd", 10)->nullable();
+            $table->string("pauseStart", 10)->nullable();
+            $table->string("pauseEnd", 10)->nullable();
             $table->unsignedBigInteger('work_schedule_id');
             $table->foreign('work_schedule_id')->references('id')->on('work_schedules')->onDelete('cascade');
             $table->timestamps();

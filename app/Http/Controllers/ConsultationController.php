@@ -130,7 +130,13 @@ class ConsultationController extends Controller
         $availableTimes = [];
         $time = Carbon::parse($workSchedule->shiftStart)->format('H:i');
         while ($time < Carbon::parse($workSchedule->shiftEnd)->format('H:i')) {
-            if(!(Carbon::parse($time)->format('H:i') >= Carbon::parse($workSchedule->pauseStart)->format('H:i') && Carbon::parse($time)->format('H:i') < Carbon::parse($workSchedule->pauseEnd)->format('H:i')) && (Carbon::parse($time)->format('H:i') >= Carbon::parse(now())->addMinutes(60)->format('H:i'))) {
+            $add = true;
+            if($workSchedule->pauseStart != null && $workSchedule->pauseEnd != null) {
+                if(Carbon::parse($time)->format('H:i') >= Carbon::parse($workSchedule->pauseStart)->format('H:i') && Carbon::parse($time)->format('H:i') < Carbon::parse($workSchedule->pauseEnd)->format('H:i')) {
+                    $add = false;
+                }
+            }
+            if($add && (Carbon::parse($time)->format('H:i') >= Carbon::parse(now())->addMinutes(60)->format('H:i'))) {
                 $availableTimes[$i++] =$time;
             }
             $time = Carbon::parse($time)->addMinutes($workSchedule->minimumConsultationTime)->format('H:i');
