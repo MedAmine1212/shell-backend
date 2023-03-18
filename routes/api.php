@@ -56,8 +56,10 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('employee/')->group(function () {
         Route::get('findAllByStationId/{station_id}', [EmployeeController::class, 'findAllByStationId']); //done
+        Route::get('getAllUnassigned', [EmployeeController::class, 'getAllUnassigned']); //done
         Route::get('findAll', [EmployeeController::class, 'findAll']); //done
         Route::get('assignToStation/{employee_id}/{station_id}', [EmployeeController::class, 'assignEmployeeToStation']); //done
+        Route::get('unassignFromStation/{employee_id}/{station_id}', [EmployeeController::class, 'unassignFromStation']); //done
         Route::post('add', [EmployeeController::class, 'addEmployee']); //done
         Route::put('update/{employee_id}', [EmployeeController::class, 'addEmployee']); //done
 
@@ -70,6 +72,7 @@ Route::middleware('auth:api')->group(function () {
         Route::get('findAll', [StationAdminController::class, 'findAll']); //done
         Route::get('getStationAdminsWithNoStation', [StationAdminController::class, 'getStationAdminsWithNoStation']); //done
         Route::get('assignStationAdmin/{station_admin_id}/{station_id}', [StationAdminController::class, 'assignAdminToStation']); //done
+        Route::get('unassignStationAdmin/{station_id}', [StationAdminController::class, 'unassignStationAdmin']); //done
     });
 
     /*************************************** user routes ************************************************** */
@@ -130,6 +133,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('product/')->group(function () {
         Route::get('findAll', [ProductController::class, 'getAllProducts']); //done
+        Route::get('findAvailableProductsToAdd/{station_id}', [ProductController::class, 'findAvailableProductsToAdd']); //done
         Route::get('findAllByStationId/{station_id}', [ProductController::class, 'findAllByStationId']); //done
 
         //add new product or add quantity
@@ -142,6 +146,7 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('service/')->group(function () {
         Route::get('findAll', [ServiceController::class, 'findAllServices']); //done
+        Route::get('findAvailableServicesToAdd/{station_id}', [ServiceController::class, 'findAvailableServicesToAdd']); //done
         Route::get('findAllByStationId/{station_id}', [ServiceController::class, 'findAllByStationId']); //done
         Route::post('add', [ServiceController::class, 'addService']); //done
         Route::put('update/{service_id}', [ServiceController::class, 'updateService']); //done

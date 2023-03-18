@@ -5,10 +5,29 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\ProductStation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class ProductController extends Controller
 {
+
+    public function findAvailableProductsToAdd(Request $request, UserController $userController, $station_id) {
+
+        if($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
+            $products = DB::table('products')
+                ->whereNotIn('id', function($query) use ($station_id) {
+                    $query->select('product_id')
+                        ->from('product_stations')
+                        ->where('station_id', '=', $station_id);
+                })
+                ->get();
+
+            return response()->json(["products" => $products],200);
+        } else {
+            return response()->json(["Forbidden"],403);
+        }
+    }
+
     public function getAllProducts(Request $request, UserController $userController) {
         if ($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
             return response()->json(["products"=>Product::all()],200);
@@ -24,7 +43,7 @@ class ProductController extends Controller
             if($product) {
                 $product->stock+=$request->get("stock");
                 $product->update();
-                return response()->json(["product stock updated"],200);
+                return response()->json(['type'=>"update","product"=>$product],200);
             } else {
                 //save image
                 $imageName = $this->saveImage($request->file("image"));
@@ -36,7 +55,7 @@ class ProductController extends Controller
                     'price' => $request->get('price'),
                     'stock' => $request->get('stock'),
                 ]);
-                return response()->json(["product"=>$product],200);
+                return response()->json(['type'=>"new","product"=>$product],200)->header('Cache-Control', 'no-cache, no-store, must-revalidate')->header('Pragma', 'no-cache')->header('Expires', '0');
             }
         } else {
             return response()->json(["Forbidden"],403);
@@ -52,9 +71,12 @@ class ProductController extends Controller
                 'message' => 'Product not found.'
             ], 404);
         }
-        $imagePath = public_path('images\products\\' . $product->image);
+        $imagePath = public_path('images/products/' . $product->image);
 
-        return response()->file($imagePath);
+        $imageData = base64_encode(file_get_contents($imagePath));
+        $imageType = mime_content_type($imagePath);
+        $image = 'data:image/' . $imageType . ';base64,' . $imageData;
+        return response()->json(["image"=>$image],200)->header('Cache-Control', 'no-cache, no-store, must-revalidate')->header('Pragma', 'no-cache')->header('Expires', '0');
     }
 
     public function updateProduct(Request $request, UserController $userController, $product_id) {
@@ -69,7 +91,7 @@ class ProductController extends Controller
                     //check if label allready in use
                     if($pr){
                         if($pr->id != $product_id)
-                        return response()->json(["Product name allready in use"],403);
+                        return response()->json(["Product name already in use"],403);
                     }
                     $product->label = $request->get('label');
                 }
@@ -79,11 +101,13 @@ class ProductController extends Controller
                     $product->price = $request->get('price');
                 if($request->has("stock"))
                     $product->stock = $request->get('stock');
-                if($request->hasFile("image") != null) {
-                    //remove old
-                    $this->removeImage($product->image);
-                    //save new
-                  $product->image = $this->saveImage($request->file("image"));
+                if($request->hasFile("image")) {
+                    if($request->file("image")!= null) {
+                        //remove old
+                        $this->removeImage($product->image);
+                        //save new
+                        $product->image = $this->saveImage($request->file("image"));
+                    }
                 }
                 $product->update();
                 return response()->json(["Product updated successfully"],200);

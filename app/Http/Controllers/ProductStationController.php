@@ -26,15 +26,15 @@ class ProductStationController extends Controller
             if($productStation){
                 ProductStation::where("product_id",$product_id)->where("station_id",$station_id)->update(["stock" =>$productStation->stock+=$request->get("stock")]);
             } else {
-            ProductStation::create([
+            $productStation = ProductStation::create([
                 "product_id" =>$product_id,
                 "station_id" =>$station_id,
                 "stock" => $request->get("stock")
             ]);
             }
-            $this->adjustStock($product_id, $request->get("stock")*(-1));
-
-            return response()->json(["Operation successful"],200);
+            $product = $this->adjustStock($product_id, $request->get("stock")*(-1));
+            $productStation->product = $product;
+            return response()->json(["productStation"=>$productStation],200);
 
         } else {
             return response()->json(["Forbidden"],403);
@@ -42,6 +42,7 @@ class ProductStationController extends Controller
     }
 
     public function removeProductFromStation(Request $request, UserController $userController, $product_id, $station_id, $restoreStock) {
+
         $station = Station::where('id',$station_id)->with("stationAdmin")->get()->first();
 
         if(!$station)
@@ -54,8 +55,9 @@ class ProductStationController extends Controller
             if(!$productStation)
                 return response()->json(["product not affected to station"], 404);
 
-            if($restoreStock)
+            if($restoreStock == 1) {
                 $this->adjustStock($product_id,$productStation->stock);
+            }
             ProductStation::where("product_id",$product_id)->where("station_id",$station_id)->delete();
 
             return response()->json(["Product removed from station successfully"],200);
@@ -71,5 +73,6 @@ class ProductStationController extends Controller
             return response()->json(["Product not found"],404);
         $product->stock+=$stock;
         $product->update();
+        return  $product;
     }
 }

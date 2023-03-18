@@ -44,6 +44,20 @@ class StationAdminController extends Controller
     }
 
 
+    public function unassignStationAdmin(Request $request, UserController $userController, $station_id) {
+        if($userController->isSuperAdmin($request->user())) {
+            $station = Station::where('id',$station_id)->get()->first();
+            if(!$station) {
+                return response()->json(["Station not found"],404);
+            }
+            $station->station_admin_id = null;
+            $station->save();
+            return response()->json(["Station admin removed"],200);
+        } else {
+            return response()->json(["Forbidden"],403);
+        }
+    }
+
     public function assignAdminToStation(Request $request, UserController $userController, $station_admin_id, $station_id) {
         if($userController->isSuperAdmin($request->user())) {
             $station = Station::where('id',$station_id)->get()->first();

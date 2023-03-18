@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class StationController extends Controller
 {
     function findById($station_id) {
-        $station = Station::where('id',$station_id)->with("stationAdmin.user")->with("employees.user")->with("workSchedule")->get()->first();
+        $station = Station::where('id',$station_id)->with("stationAdmin.user")->with("employees.user")->with("workSchedule")->with("stationServices.service")->with("stationProducts.product")->get()->first();
         if(!$station) {
             return response()->json(["Station not found"],404);
         }

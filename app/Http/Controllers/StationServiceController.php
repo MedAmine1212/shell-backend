@@ -35,11 +35,12 @@ class StationServiceController extends Controller
             if(StationService::where("service_id",$service_id)->where("station_id",$station_id)->get()->first())
                 return response()->json(["Service already affected to station"],200);
 
-             StationService::create([
+             $stationService = StationService::create([
                  "service_id" =>$service_id,
                  "station_id" =>$station_id
             ]);
-            return response()->json(["Service affected to station successfully"],200);
+             $stationService->service = $service;
+            return response()->json(["stationService"=>$stationService],200);
         } else {
             return response()->json(["Forbidden"],403);
         }

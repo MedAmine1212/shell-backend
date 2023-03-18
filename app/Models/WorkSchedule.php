@@ -10,15 +10,16 @@ class WorkSchedule extends Model
     use HasFactory;
 
     protected $fillable = [
-        'shiftStart',
-        'shiftEnd',
-        'pauseStart',
-        'pauseEnd',
         'minimumConsultationTime'
     ];
 
     public function stations()
     {
         return $this->hasMany(Station::class);
+    }
+
+    public function workingDays()
+    {
+        return $this->hasMany(WorkingDays::class);
     }
 }

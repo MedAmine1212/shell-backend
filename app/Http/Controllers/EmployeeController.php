@@ -8,6 +8,27 @@ use App\Models\User;
 use Illuminate\Http\Request;
 class EmployeeController extends Controller
 {
+    public function unassignFromStation(Request $request, UserController $userController, $employee_id, $station_id) {
+
+        if($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
+            $emp = Employee::where('id',$employee_id)->get()->first();
+            if(!$emp)
+                return response()->json(["Employee not found"],404);
+            $emp->station_id = null;
+            $emp->update();
+            return response()->json(["Unassigned successfully"],200);
+        } else {
+            return response()->json(["Forbidden"],403);
+        }
+    }
+    public function getAllUnassigned(Request $request, UserController $userController) {
+
+        if($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
+            return response()->json(["employees"=>Employee::where("station_id",null)->with("user")->get()],200);
+        } else {
+            return response()->json(["Forbidden"],403);
+        }
+    }
     public function addEmployee(Request $request, UserController $userController) {
         if($userController->isSuperAdmin($request->user())) {
         $user = $userController->addUser($request, true);

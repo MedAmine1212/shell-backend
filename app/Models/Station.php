@@ -31,6 +31,14 @@ class Station extends Model
     {
         return $this->hasMany(Employee::class);
     }
+    public function stationServices()
+    {
+        return $this->hasMany(StationService::class);
+    }
+    public function stationProducts()
+    {
+        return $this->hasMany(ProductStation::class);
+    }
 
     public function bornes()
     {

@@ -74,7 +74,12 @@ class BorneController extends Controller
         if (!$station) {
             return response()->json('Station not found', 404);
         }
-        if ($station->stationAdmin->user_id == $request->user()->id || $userController->isSuperAdmin($request->user())) {
+        $stationAdmin = false;
+        if($station->stationAdmin) {
+            if($station->stationAdmin->user_id == $request->user()->id)
+                $stationAdmin = true;
+        }
+        if ($stationAdmin || $userController->isSuperAdmin($request->user())) {
 
             $borne = Borne::create([
                 'status' => false,

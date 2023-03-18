@@ -14,14 +14,9 @@ return new class extends Migration
     {
         Schema::create('work_schedules', function (Blueprint $table) {
             $table->id()->autoIncrement();
-            $table->string("shiftStart", 10);
-            $table->string("shiftEnd", 10);
-            $table->string("pauseStart", 10);
-            $table->string("pauseEnd", 10);
             $table->integer("minimumConsultationTime")->default(30);
             $table->timestamps();
         });
-
 
         DB::statement('ALTER TABLE stations
             ADD CONSTRAINT FOREIGN KEY (work_schedule_id) REFERENCES work_schedules(id) ON DELETE SET NULL;'

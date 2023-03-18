@@ -92,11 +92,25 @@ class ConsultationController extends Controller
     //get available time slots considering : WorkSchedule, Employees shifts, reserved Times.
     public function getAvailableTimeSlots($station_id, $consultation_id)
     {
-        $station = Station::where('id',$station_id)->with("workSchedule")->get()->first();
+        $today = Carbon::today()->englishDayOfWeek; // Get the name of the day in English (e.g. Monday, Tuesday)
+
+        $station = Station::where("id",$station_id)->with(['workSchedule' => function ($query) use ($today) {
+            $query->with(['workingDays' => function ($query) use ($today) {
+                $query->whereRaw('LOWER(day) = LOWER(?)', [$today])
+                    ->where('working', true);
+            }]);
+        }])->get()->first();
         if(!$station)
             return response()->json(["Station not found"],404);
+        if(sizeof($station->workSchedule->workingDays) === 0)
+            return response()->json(["station closed"],200);
         $workSchedule = $station->workSchedule;
-        $occupiedTimes = $this->getOccupiedTimes($station_id, $consultation_id, $workSchedule);
+        //setting up the workingSchedule
+        $workSchedule->shiftStart = $workSchedule->workingDays->first()->shiftStart;
+        $workSchedule->shiftEnd = $workSchedule->workingDays->first()->shiftEnd;
+        $workSchedule->pauseStart = $workSchedule->workingDays->first()->pauseStart;
+        $workSchedule->pauseEnd = $workSchedule->workingDays->first()->pauseEnd;
+        $occupiedTimes = $this->getOccupiedTimes($station_id, $consultation_id);
 
         $currentConsultation = Consultation::leftJoin('consultation_services', 'consultations.id', '=', 'consultation_services.consultation_id')
             ->leftJoin('services', 'services.id', '=', 'consultation_services.service_id')
@@ -115,14 +129,18 @@ class ConsultationController extends Controller
         $i = 0;
         $availableTimes = [];
         $time = Carbon::parse($workSchedule->shiftStart)->format('H:i');
-
         while ($time < Carbon::parse($workSchedule->shiftEnd)->format('H:i')) {
             if(!(Carbon::parse($time)->format('H:i') >= Carbon::parse($workSchedule->pauseStart)->format('H:i') && Carbon::parse($time)->format('H:i') < Carbon::parse($workSchedule->pauseEnd)->format('H:i')) && (Carbon::parse($time)->format('H:i') >= Carbon::parse(now())->addMinutes(60)->format('H:i'))) {
                 $availableTimes[$i++] =$time;
             }
             $time = Carbon::parse($time)->addMinutes($workSchedule->minimumConsultationTime)->format('H:i');
         }
+            $timeToReturn = [];
             for ($i=0;$i<sizeof($availableTimes);$i++) {
+                $add = true;
+                if(Carbon::parse($availableTimes[$i])->addMinutes($currentConsultation->duration)->format('H:i') >Carbon::parse($workSchedule->shiftEnd)->format('H:i')) {
+                    $add = false;
+                } else if(sizeof($occupiedTimes) > 0) {
                 $busy = 0;
 
                 for ($j = 0; $j < sizeof($occupiedTimes); $j++) {
@@ -135,13 +153,16 @@ class ConsultationController extends Controller
                     }
                 }
                 if($busy == sizeof($occupiedTimes)) {
-                    unset($availableTimes[$i]);
+                    $add = false;
                 }
             }
-        return $availableTimes;
+                if($add)
+                    array_push($timeToReturn, $availableTimes[$i]);
+            }
+        return $timeToReturn;
     }
 
-    public function getOccupiedTimes($station_id, $consultation_id, $workSchedule) {
+    public function getOccupiedTimes($station_id, $consultation_id) {
         $currentDate = now()->format('Y-m-d');
         $employees = Employee::where("station_id", $station_id)->with('consultations', function ($query) use ($currentDate) {
             $query->whereRaw("dateConsultation BETWEEN '".$currentDate." 00:00:00' AND '".$currentDate." 23:59:59'");
