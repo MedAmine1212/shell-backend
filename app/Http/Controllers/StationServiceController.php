@@ -37,7 +37,8 @@ class StationServiceController extends Controller
 
              $stationService = StationService::create([
                  "service_id" =>$service_id,
-                 "station_id" =>$station_id
+                 "station_id" =>$station_id,
+                 "price" =>$request->get("price")
             ]);
              $stationService->service = $service;
             return response()->json(["stationService"=>$stationService],200);

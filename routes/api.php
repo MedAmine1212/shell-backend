@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AdvertisementController;
 use App\Http\Controllers\BorneController;
 use App\Http\Controllers\ClientController;
 use App\Http\Controllers\ConsultationController;
@@ -50,8 +51,6 @@ Route::get('/product/getImageByProductId/{product_id}', [ProductController::clas
 // Auth required
 Route::middleware('auth:api')->group(function () {
 
-    Route::get('/getCurrentUser', function (Request $request) {return $request->user();}); //done
-
 
     /*************************************** Employee routes ************************************************** */
 
@@ -62,7 +61,6 @@ Route::middleware('auth:api')->group(function () {
         Route::get('assignToStation/{employee_id}/{station_id}', [EmployeeController::class, 'assignEmployeeToStation']); //done
         Route::get('unassignFromStation/{employee_id}/{station_id}', [EmployeeController::class, 'unassignFromStation']); //done
         Route::post('add', [EmployeeController::class, 'addEmployee']); //done
-        Route::put('update/{employee_id}', [EmployeeController::class, 'addEmployee']); //done
 
     });
 
@@ -115,7 +113,7 @@ Route::middleware('auth:api')->group(function () {
     Route::prefix('station/')->group(function () {
         Route::get('findAll', [StationController::class, 'getAllStations']); //done
         Route::get('findById/{station_id}', [StationController::class, 'findById']); //done
-        Route::get('getOneByAdminId/{station_admin_id}', [StationController::class, 'getStationByAdminId']); //done
+        Route::get('getStationByAdminId/{station_admin_id}', [StationController::class, 'getStationByAdminId']); //done
         Route::post('add', [StationController::class, 'addStation']); //done
         Route::put('update/{station_id}', [StationController::class, 'update']); //done
         Route::delete('delete/{station_id}', [StationController::class, 'delete']); // done
@@ -169,7 +167,7 @@ Route::middleware('auth:api')->group(function () {
     /*************************************** Station_service routes ************************************************** */
 
     Route::prefix('station_service/')->group(function () {
-        Route::get('addServiceToStation/{service_id}/{station_id}', [StationServiceController::class, 'addServiceToStation']); //done
+        Route::post('addServiceToStation/{service_id}/{station_id}', [StationServiceController::class, 'addServiceToStation']); //done
         Route::get('removeServiceFromStation/{service_id}/{station_id}', [StationServiceController::class, 'removeServiceFromStation']); //done
 
     });
@@ -195,12 +193,22 @@ Route::middleware('auth:api')->group(function () {
 
     Route::prefix('workSchedule/')->group(function () {
         //pass station_id to assign workSchedule to station directly
+        Route::get('findAll', [WorkScheduleController::class, 'findAll']); //done
         Route::post('create', [WorkScheduleController::class, 'createWorkSchedule']); //done
         Route::get('assignToStation/{station_id}/{word_schedule_id}', [WorkScheduleController::class, 'assignToStation']); //done
         Route::put('update/{work_schedule_id}', [WorkScheduleController::class, 'updateWorkSchedule']); //done
         Route::put('updateWorkingDay/{working_day_id}', [WorkingDaysController::class, 'updateWorkingDay']); //done
         Route::delete('delete/{work_schedule_id}', [WorkScheduleController::class, 'deleteWorkSchedule']); //done
     });
+
+    Route::prefix('advertisement/')->group(function () {
+        Route::post('createNewAdd', [AdvertisementController::class, 'createNewAdd']); //done
+        Route::get('findAll', [AdvertisementController::class, 'findAll']); //done
+        Route::get('findAllByBorneId/{borne_id}', [AdvertisementController::class, 'findAllByBorneId']); //done
+        Route::delete('delete/{advertisement_id}', [AdvertisementController::class, 'delete']); //done
+        Route::get('addAdToBorne/{advertisement_id}/{borne_id}', [AdvertisementController::class, 'addAdToBorne']); //done
+        Route::get('removeAdFromBorne/{advertisement_id}/{borne_id}', [AdvertisementController::class, 'removeAdFromBorne']); //done
+        });
 
 //remove token
 Route::post('/logout',[UserController::class, 'logout']); //done

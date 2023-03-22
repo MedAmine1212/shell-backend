@@ -19,7 +19,6 @@ class ServiceController extends Controller
                         ->where('station_id', '=', $station_id);
                 })
                 ->get();
-
             return response()->json(["services" => $services],200);
         } else {
             return response()->json(["Forbidden"],403);
@@ -35,10 +34,11 @@ class ServiceController extends Controller
 
     public function findAllByStationId(Request $request, UserController $userController, $station_id){
             $stationServices = StationService::where("station_id", $station_id)->with("service")->get();
+            $services = [];
             if(sizeof($stationServices)>0) {
-                $services = [];
                 $i = 0;
                 foreach ($stationServices as $ss) {
+                    $ss->service->price = $ss->price;
                     $services[$i++] = $ss->service;
                 }
                 return response()->json(["services" => $services],200);

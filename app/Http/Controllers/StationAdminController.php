@@ -14,6 +14,10 @@ class StationAdminController extends Controller
 
     public function addStationAdmin(Request $request, UserController $userController) {
         if($userController->isSuperAdmin($request->user())) {
+            if(!$request->has("password"))
+            {
+                return response()->json(["Password required"],401);
+            }
         $user = $userController->addUser($request, false);
             if($user == "password required") {
                 return response()->json(["Password required"],401);

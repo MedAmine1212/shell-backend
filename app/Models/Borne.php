@@ -22,4 +22,9 @@ class Borne extends Model
     {
         return $this->belongsTo(Station::class);
     }
+
+    public function borneAdvertisements()
+    {
+        return $this->hasMany(BorneAdvertisements::class);
+    }
 }

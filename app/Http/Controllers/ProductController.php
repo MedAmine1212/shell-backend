@@ -46,7 +46,7 @@ class ProductController extends Controller
                 return response()->json(['type'=>"update","product"=>$product],200);
             } else {
                 //save image
-                $imageName = $this->saveImage($request->file("image"));
+                $imageName = $this->saveImage($request->file("image"),'images/products/');
 
                 $product = Product::create([
                     'label' => $request->get('label'),
@@ -104,9 +104,9 @@ class ProductController extends Controller
                 if($request->hasFile("image")) {
                     if($request->file("image")!= null) {
                         //remove old
-                        $this->removeImage($product->image);
+                        $this->removeImage($product->image,'images\products');
                         //save new
-                        $product->image = $this->saveImage($request->file("image"));
+                        $product->image = $this->saveImage($request->file("image"), 'images/products/');
                     }
                 }
                 $product->update();
@@ -116,9 +116,9 @@ class ProductController extends Controller
             }
     }
 
-    public function saveImage($image) {
+    public function saveImage($image, $path) {
         $image_name = time() . '-' . $image->getClientOriginalName();
-        $image->move(public_path('images/products/'), $image_name);
+        $image->move(public_path($path), $image_name);
         return $image_name;
     }
     public function deleteProduct($product_id, UserController $userController, Request $request) {
@@ -127,15 +127,15 @@ class ProductController extends Controller
             $product = Product::where('id',$product_id)->get()->first();
             if(!$product)
                 return response()->json(["Product not found"],404);
-            $this->removeImage($product->image);
+            $this->removeImage($product->image ,"images\products");
             $product->delete();
             return response()->json(["Product deleted successfully"],200);
         }else {
             return response()->json(["Forbidden"],403);
         }
     }
-    public function removeImage($imagePath) {
-        $path = public_path('images\products\\' . $imagePath);
+    public function removeImage($imagePath, $path) {
+        $path = public_path($path.'\\' . $imagePath);
         unlink($path);
     }
 

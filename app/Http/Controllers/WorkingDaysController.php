@@ -18,6 +18,7 @@ class WorkingDaysController extends Controller
                 'working' => $workingDay['working'],
                 'shiftStart' => $workingDay['shiftStart'],
                 'shiftEnd' => $workingDay['shiftEnd'],
+                'pause' => $workingDay['pause'],
                 'pauseStart' => $workingDay['pauseStart'],
                 'pauseEnd' => $workingDay['pauseEnd'],
             ]);
@@ -36,6 +37,8 @@ class WorkingDaysController extends Controller
 
             if($request->has("working"))
                 $workingDay->working = $request->get('working');
+            if($request->has("pause"))
+                $workingDay->pause = $request->get('pause');
             if($request->has("shiftStart"))
                 $workingDay->shiftStart = $request->get('shiftStart');
             if($request->has("shiftEnd"))

@@ -31,6 +31,8 @@ class EmployeeController extends Controller
     }
     public function addEmployee(Request $request, UserController $userController) {
         if($userController->isSuperAdmin($request->user())) {
+            if(!$request->has("barCode"))
+                return response()->json(["Barcode required"],401);
         $user = $userController->addUser($request, true);
              if($user == "email in use") {
                 return response()->json(["Email already in use"],401);

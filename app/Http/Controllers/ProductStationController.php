@@ -29,6 +29,7 @@ class ProductStationController extends Controller
             $productStation = ProductStation::create([
                 "product_id" =>$product_id,
                 "station_id" =>$station_id,
+                "price" => $request->get("price"),
                 "stock" => $request->get("stock")
             ]);
             }

@@ -15,6 +15,7 @@ class WorkingDays extends Model
         'working',
         'shiftStart',
         'shiftEnd',
+        'pause',
         'pauseStart',
         'pauseEnd'
     ];

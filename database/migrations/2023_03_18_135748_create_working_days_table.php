@@ -15,8 +15,9 @@ return new class extends Migration
             $table->id();
             $table->string("day", 10);
             $table->boolean("working")->default(true);
-            $table->string("shiftStart", 10)->nullable();
-            $table->string("shiftEnd", 10)->nullable();
+            $table->string("shiftStart", 10)->default("08:00");
+            $table->string("shiftEnd", 10)->default("17:00");
+            $table->boolean("pause")->default(true);
             $table->string("pauseStart", 10)->nullable();
             $table->string("pauseEnd", 10)->nullable();
             $table->unsignedBigInteger('work_schedule_id');

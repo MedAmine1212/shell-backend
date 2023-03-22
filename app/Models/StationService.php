@@ -12,7 +12,7 @@ class StationService extends Model
     protected $fillable = [
         'service_id',
         'station_id',
-        'status',
+        'price',
     ];
 
     public function service()

@@ -10,6 +10,11 @@ use Illuminate\Http\Request;
 class WorkScheduleController extends Controller
 {
 
+    public function findAll(Request $request, UserController $userController) {
+        if ($userController->isSuperAdmin($request->user()) || $userController->isStationAdmin($request->user())) {
+            return response()->json(["workSchedules"=>WorkSchedule::with("workingDays")->get()], 200);
+        }
+    }
     public function updateWorkSchedule(Request $request, UserController $userController, $wok_schedule_id) {
         if ($userController->isSuperAdmin($request->user())) {
             $workSchedule = WorkSchedule::where('id',$wok_schedule_id)->get()->first();
@@ -48,8 +53,8 @@ class WorkScheduleController extends Controller
             if($request->has("station_id")) {
                 Station::where('id',$request->get("station_id"))->update(["work_schedule_id" => $workSchedule->id]);
             }
-            $workSchedule->workingDays = $workingDaysController->makeWorkingDays($request->get("days"), $workSchedule->id);
-            return response()->json(["workScheduke"=>$workSchedule],200);
+            $workSchedule->working_days = $workingDaysController->makeWorkingDays($request->get("days"), $workSchedule->id);
+            return response()->json(["workSchedule"=>$workSchedule],200);
         } else {
             return response()->json(["Forbidden"],403);
         }

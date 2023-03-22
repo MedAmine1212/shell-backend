@@ -13,6 +13,7 @@ class ProductStation extends Model
         'product_id',
         'station_id',
         'stock',
+        'price',
     ];
 
     public function product()

@@ -131,7 +131,7 @@ class ConsultationController extends Controller
         $time = Carbon::parse($workSchedule->shiftStart)->format('H:i');
         while ($time < Carbon::parse($workSchedule->shiftEnd)->format('H:i')) {
             $add = true;
-            if($workSchedule->pauseStart != null && $workSchedule->pauseEnd != null) {
+            if($workSchedule->pause && ($workSchedule->pauseStart != null && $workSchedule->pauseEnd != null)) {
                 if(Carbon::parse($time)->format('H:i') >= Carbon::parse($workSchedule->pauseStart)->format('H:i') && Carbon::parse($time)->format('H:i') < Carbon::parse($workSchedule->pauseEnd)->format('H:i')) {
                     $add = false;
                 }

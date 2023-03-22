@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
             $table->integer('stock');
+            $table->double('price');
             $table->timestamps();
         });
     }

@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('station_services', function (Blueprint $table) {
             $table->unsignedBigInteger('service_id');
             $table->unsignedBigInteger('station_id');
+            $table->double('price');
             $table->primary(['service_id', 'station_id']);
             $table->foreign('service_id')->references('id')->on('services')->onDelete('cascade');
             $table->foreign('station_id')->references('id')->on('stations')->onDelete('cascade');
